@@ -51,8 +51,18 @@ RUN curl -fsSL https://opencode.ai/install | bash
 # Add OpenCode install location to PATH
 ENV PATH="/root/.local/bin:${PATH}"
 
-# Install GSD (get-shit-done-cc) and pre-configure for OpenCode
-RUN npx --yes get-shit-done-cc@latest --opencode --global
+# Install Claude Code CLI
+RUN npm install -g @anthropic-ai/claude-code
+
+# Install GSD (get-shit-done-cc) and pre-configure for OpenCode + Claude
+RUN npx --yes get-shit-done-cc@latest --opencode --global \
+    && npx --yes get-shit-done-cc@latest --claude --global
+
+# Install Graphify — AI knowledge graph (PyPI: graphifyy)
+RUN pip install --break-system-packages "graphifyy[all]"
+
+# Install Caveman — output token compression for AI agents
+RUN curl -fsSL https://raw.githubusercontent.com/JuliusBrussee/caveman/main/install.sh | bash
 
 # Install GSD2 (gsd-pi)
 RUN npm install -g gsd-pi@2.58.0
