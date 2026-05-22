@@ -128,7 +128,8 @@ curl -fsSL .../install.sh | bash -s -- --install-dir /usr/local/bin
 
 ## Company certificates (Helvetia)
 
-If you need company CA certificates, use the helvetia install script:
+If you need custom company CA certificates (for example on a corporate network),
+use the Helvetia install script:
 
 ```powershell
 irm https://raw.githubusercontent.com/tiliavir/devcon-spaetzle/main/scripts/install-helvetia.ps1 | iex
