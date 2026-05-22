@@ -46,7 +46,7 @@ Write-Info "Creating temporary Dockerfile..."
 
 $dockerfileContent = @"
 FROM jfrog.balgroupit.com/git-platform-docker/certbundler:latest AS certbundler
-FROM ghcr.io/tiliavir/opencode-spaetzle:latest
+FROM ghcr.io/tiliavir/devcon-spaetzle:latest
 
 COPY --from=certbundler /app/certbundler /app/certbundler
 USER root

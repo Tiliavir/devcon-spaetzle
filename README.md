@@ -130,8 +130,8 @@ curl -fsSL .../install.sh | bash -s -- --install-dir /usr/local/bin
 
 If you need company CA certificates, use the helvetia install script:
 
-```bash
-curl -fsSL https://raw.githubusercontent.com/tiliavir/devcon-spaetzle/main/scripts/install-helvetia.sh | bash
+```powershell
+irm https://raw.githubusercontent.com/tiliavir/devcon-spaetzle/main/scripts/install-helvetia.ps1 | iex
 ```
 
 This builds a local wrapper image with your certificates baked in. See the script for customization options.
@@ -193,7 +193,6 @@ devcon-spaetzle/
 ├── scripts/
 │   ├── install.sh         # Bash install script
 │   ├── install.ps1        # PowerShell install script
-│   ├── install-helvetia.sh
 │   ├── install-helvetia.ps1
 │   └── run.sh            # Legacy wrapper
 ├── Dockerfile

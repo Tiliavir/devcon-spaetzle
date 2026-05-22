@@ -53,10 +53,6 @@ RUN curl -fsSL https://opencode.ai/install | bash
 # Add OpenCode install location to PATH
 ENV PATH="/root/.local/bin:${PATH}"
 
-# Install Claude Code CLI
-# hadolint ignore=DL3016
-RUN npm install -g @anthropic-ai/claude-code
-
 # Install GSD (get-shit-done-cc) and pre-configure for OpenCode + Claude
 RUN npx --yes get-shit-done-cc@latest --opencode --global \
     && npx --yes get-shit-done-cc@latest --claude --global
