@@ -146,33 +146,49 @@ wrapper_template="$(cat << 'WRAPPER_EOF'
 # npmrc, Maven settings) and forwards API tokens when present.
 #
 # Usage:
-#   spaetzle [docker run extra flags…] [-- command]
+#   spaetzle [flags] [docker run extra flags…] [-- command]
+#
+# Flags:
+#   --recreate    Remove existing container for this workspace and start fresh
+#   --update      Pull latest image and re-install the wrapper
+#   --version     Show version info
 #
 # Examples:
 #   spaetzle
 #   spaetzle -e OPENAI_API_KEY=sk-...
 #   spaetzle -- opencode
-#   spaetzle --version
+#   spaetzle --recreate
+#   spaetzle --update
 
 set -euo pipefail
 
 IMAGE="${OPENCODE_IMAGE:-ghcr.io/tiliavir/devcon-spaetzle:latest}"
 WORKSPACE="${WORKSPACE:-$(pwd)}"
 
+RECREATE=false
+UPDATE=false
+
 warn()  { echo "[spaetzle] WARNING: $*" >&2; }
 info()  { echo "[spaetzle] $*"; }
-
-if [[ "${1:-}" == "--version" ]] || [[ "${1:-}" == "-v" ]]; then
-    echo "spaetzle wrapper for devcon-spaetzle"
-    echo "Image: ${IMAGE}"
-    echo "Workspace: ${WORKSPACE}"
-    exit 0
-fi
 
 EXTRA_ARGS=()
 CMD_OVERRIDE=()
 while [[ $# -gt 0 ]]; do
     case "$1" in
+        --version|-v)
+            echo "spaetzle wrapper for devcon-spaetzle"
+            echo "Image: ${IMAGE}"
+            echo "Workspace: ${WORKSPACE}"
+            exit 0
+            ;;
+        --recreate)
+            RECREATE=true
+            shift
+            ;;
+        --update)
+            UPDATE=true
+            shift
+            ;;
         --)
             shift
             CMD_OVERRIDE=("$@")
@@ -184,6 +200,14 @@ while [[ $# -gt 0 ]]; do
             ;;
     esac
 done
+
+if [ "${UPDATE}" = "true" ]; then
+    info "Pulling latest image..."
+    docker pull "${IMAGE}"
+    info "Re-installing spaetzle wrapper..."
+    curl -fsSL https://raw.githubusercontent.com/tiliavir/devcon-spaetzle/main/scripts/install.sh | bash
+    exit 0
+fi
 
 ENV_FLAGS=()
 
@@ -215,6 +239,18 @@ LABEL="spaetzle-$(basename "${WORKSPACE}")"
 info "Starting devcon-spaetzle container (image: ${IMAGE})"
 info "Workspace: ${WORKSPACE}"
 info "Container label: ${LABEL}"
+
+info "Checking for newer image..."
+if docker pull "${IMAGE}" 2>&1 | grep -q "Downloaded newer"; then
+    info "A newer image was pulled. Run 'spaetzle --update' to regenerate the wrapper."
+fi
+
+if [ "${RECREATE}" = "true" ]; then
+    if docker container inspect "${LABEL}" &>/dev/null; then
+        info "Removing existing container '${LABEL}'..."
+        docker rm -f "${LABEL}"
+    fi
+fi
 
 if docker container inspect "${LABEL}" &>/dev/null; then
     STATUS="$(docker container inspect --format '{{.State.Status}}' "${LABEL}")"

@@ -5,18 +5,24 @@
 # Copilot/OpenCode auth stores) and forwards GITHUB_TOKEN when present.
 #
 # Usage:
-#   ./scripts/run.sh [docker run extra flags…] [-- command]
+#   ./scripts/run.sh [flags] [docker run extra flags…] [-- command]
+#
+# Flags:
+#   --recreate    Remove existing container for this workspace and start fresh
+#   --version     Show version info
 #
 # Examples:
 #   ./scripts/run.sh
 #   ./scripts/run.sh -e OPENAI_API_KEY=sk-...
 #   ./scripts/run.sh -- opencode
+#   ./scripts/run.sh --recreate
 
 set -euo pipefail
 
 IMAGE="${OPENCODE_IMAGE:-ghcr.io/tiliavir/devcon-spaetzle:latest}"
 WORKSPACE="${WORKSPACE:-$(pwd)}"
 CONTAINER_USER_HOME="${CONTAINER_USER_HOME:-/root}"
+RECREATE=false
 
 # ── helpers ────────────────────────────────────────────────────────────────────
 
@@ -40,6 +46,16 @@ EXTRA_ARGS=()
 CMD_OVERRIDE=()
 while [[ $# -gt 0 ]]; do
   case "$1" in
+    --version|-v)
+      echo "run.sh wrapper for devcon-spaetzle"
+      echo "Image: ${IMAGE}"
+      echo "Workspace: ${WORKSPACE}"
+      exit 0
+      ;;
+    --recreate)
+      RECREATE=true
+      shift
+      ;;
     --)
       shift
       CMD_OVERRIDE=("$@")
@@ -108,6 +124,18 @@ LABEL="spaetzle-$(basename "${WORKSPACE}")"
 info "Starting devcon-spaetzle container (image: ${IMAGE})"
 info "Workspace: ${WORKSPACE}"
 info "Container label: ${LABEL}"
+
+info "Checking for newer image..."
+if docker pull "${IMAGE}" 2>&1 | grep -q "Downloaded newer"; then
+    info "A newer image was pulled."
+fi
+
+if [ "${RECREATE}" = "true" ]; then
+    if docker container inspect "${LABEL}" &>/dev/null; then
+        info "Removing existing container '${LABEL}'..."
+        docker rm -f "${LABEL}"
+    fi
+fi
 
 if docker container inspect "${LABEL}" &>/dev/null; then
   STATUS="$(docker container inspect --format '{{.State.Status}}' "${LABEL}")"

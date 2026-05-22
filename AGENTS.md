@@ -18,7 +18,6 @@ opencode-spaetzle/
 │   ├── run.sh                  # Dynamic run wrapper (detects mounts at runtime)
 │   ├── install.sh              # Bash installer (generates a baked spaetzle script)
 │   ├── install.ps1             # PowerShell installer (generates spaetzle.ps1 + .cmd)
-│   └── install-helvetia.ps1   # Helvetia variant (adds company CA certs)
 ├── docs/
 │   ├── architecture.md         # Design decisions and layer structure
 │   └── development.md          # Developer guide: local workflow, CI/CD, releases

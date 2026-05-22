@@ -106,12 +106,19 @@ $scriptContent = @'
 # npmrc, Maven settings) and forwards API tokens when present.
 #
 # Usage:
-#   spaetzle.ps1 [docker run extra flags...] [-- command]
+#   spaetzle.ps1 [flags] [docker run extra flags...] [-- command]
+#
+# Flags:
+#   --recreate    Remove existing container for this workspace and start fresh
+#   --update      Pull latest image and re-install the wrapper
+#   --version     Show version info
 #
 # Examples:
 #   spaetzle.ps1
 #   spaetzle.ps1 -e OPENAI_API_KEY=sk-...
 #   spaetzle.ps1 -- opencode
+#   spaetzle.ps1 --recreate
+#   spaetzle.ps1 --update
 
 param(
     [string]$Image = $env:OPENCODE_IMAGE,
@@ -125,6 +132,9 @@ if (-not $Image) {
 }
 
 $ErrorActionPreference = "Stop"
+
+$Recreate = $args -contains "--recreate"
+$Update = $args -contains "--update"
 
 function Write-Info {
     param([string]$Message)
@@ -140,6 +150,14 @@ if ($args -contains "-v" -or $args -contains "--version") {
     Write-Info "spaetzle wrapper for devcon-spaetzle"
     Write-Info "Image: $Image"
     Write-Info "Workspace: $Workspace"
+    exit 0
+}
+
+if ($Update) {
+    Write-Info "Pulling latest image..."
+    docker pull $Image
+    Write-Info "Re-installing spaetzle wrapper..."
+    irm https://raw.githubusercontent.com/tiliavir/devcon-spaetzle/main/scripts/install.ps1 | iex
     exit 0
 }
 
@@ -193,6 +211,20 @@ if ($Command) {
 Write-Info "Starting devcon-spaetzle container (image: $Image)"
 Write-Info "Workspace: $Workspace"
 Write-Info "Container label: $label"
+
+Write-Info "Checking for newer image..."
+$pullOutput = docker pull $Image 2>&1
+if ($pullOutput -match "Downloaded newer") {
+    Write-Info "A newer image was pulled. Run 'spaetzle --update' to regenerate the wrapper."
+}
+
+if ($Recreate) {
+    $null = docker container inspect $label 2>&1
+    if ($LASTEXITCODE -eq 0) {
+        Write-Info "Removing existing container '$label'..."
+        docker rm -f $label
+    }
+}
 
 $null = docker container inspect $label 2>&1
 if ($LASTEXITCODE -eq 0) {

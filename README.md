@@ -103,6 +103,23 @@ spaetzle -e OPENAI_API_KEY=sk-...
 spaetzle --version
 ```
 
+### Recreate the container
+
+```bash
+spaetzle --recreate
+```
+
+Removes the existing container for the current workspace and starts a fresh one.
+
+### Update to the latest version
+
+```bash
+spaetzle --update
+```
+
+Pulls the latest image and re-installs the wrapper script. Use this when a new
+version of devcon-spaetzle is released.
+
 ---
 
 ## Customization
@@ -125,17 +142,6 @@ curl -fsSL .../install.sh | bash -s -- --install-dir /usr/local/bin
 ```
 
 ---
-
-## Company certificates (Helvetia)
-
-If you need custom company CA certificates (for example on a corporate network),
-use the Helvetia install script:
-
-```powershell
-irm https://raw.githubusercontent.com/tiliavir/devcon-spaetzle/main/scripts/install-helvetia.ps1 | iex
-```
-
-This builds a local wrapper image with your certificates baked in. See the script for customization options.
 
 ---
 
@@ -194,7 +200,6 @@ devcon-spaetzle/
 ├── scripts/
 │   ├── install.sh         # Bash install script
 │   ├── install.ps1        # PowerShell install script
-│   ├── install-helvetia.ps1
 │   └── run.sh            # Legacy wrapper
 ├── Dockerfile
 └── README.md

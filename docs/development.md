@@ -43,6 +43,9 @@ Or use the convenience wrapper (auto-detects git config, SSH keys, and tokens):
 
 ```bash
 ./scripts/run.sh
+
+# Recreate the container for a fresh start
+./scripts/run.sh --recreate
 ```
 
 ### Lint the Dockerfile
