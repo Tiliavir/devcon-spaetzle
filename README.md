@@ -1,4 +1,4 @@
-# opencode-spaetzle 🥣
+# devcon-spaetzle 🥣
 
 > **Smart Programming Ägent for Task-realization with Zero-friction in a Locked-down Environment.**
 
@@ -12,13 +12,13 @@ A minimal but practical Docker-based development environment for running the
 ### Bash (Linux/macOS/Git Bash)
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/tiliavir/opencode-spaetzle/main/scripts/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/tiliavir/devcon-spaetzle/main/scripts/install.sh | bash
 ```
 
 ### PowerShell (Windows)
 
 ```powershell
-irm https://raw.githubusercontent.com/tiliavir/opencode-spaetzle/main/scripts/install.ps1 | iex
+irm https://raw.githubusercontent.com/tiliavir/devcon-spaetzle/main/scripts/install.ps1 | iex
 ```
 
 After installation, run:
@@ -103,6 +103,23 @@ spaetzle -e OPENAI_API_KEY=sk-...
 spaetzle --version
 ```
 
+### Recreate the container
+
+```bash
+spaetzle --recreate
+```
+
+Removes the existing container for the current workspace and starts a fresh one.
+
+### Update to the latest version
+
+```bash
+spaetzle --update
+```
+
+Pulls the latest image and re-installs the wrapper script. Use this when a new
+version of devcon-spaetzle is released.
+
 ---
 
 ## Customization
@@ -115,7 +132,7 @@ OPENCODE_IMAGE=my-custom-image spaetzle
 
 Or during install:
 ```bash
-curl -fsSL .../install.sh | bash -s -- --image my-registry/opencode-spaetzle:dev
+curl -fsSL .../install.sh | bash -s -- --image my-registry/devcon-spaetzle:dev
 ```
 
 ### Custom install location
@@ -126,16 +143,6 @@ curl -fsSL .../install.sh | bash -s -- --install-dir /usr/local/bin
 
 ---
 
-## Company certificates (Helvetia)
-
-If you need company CA certificates, use the helvetia install script:
-
-```bash
-irm https://raw.githubusercontent.com/tiliavir/opencode-spaetzle/main/scripts/install-helvetia.ps1 | iex
-```
-
-This builds a local wrapper image with your certificates baked in. See the script for customization options.
-
 ---
 
 ## Dev Container
@@ -144,8 +151,8 @@ Add `.devcontainer/devcontainer.json` to your project:
 
 ```jsonc
 {
-  "name": "opencode-spaetzle",
-  "image": "ghcr.io/tiliavir/opencode-spaetzle:latest",
+  "name": "devcon-spaetzle",
+  "image": "ghcr.io/tiliavir/devcon-spaetzle:latest",
   "workspaceFolder": "/workspace",
   "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind",
   "remoteEnv": {
@@ -171,7 +178,7 @@ Add `.devcontainer/devcontainer.json` to your project:
 ## Building from source
 
 ```bash
-docker build -t opencode-spaetzle .
+docker build -t devcon-spaetzle .
 ```
 
 ---
@@ -187,14 +194,12 @@ docker build -t opencode-spaetzle .
 ## Project structure
 
 ```
-opencode-spaetzle/
+devcon-spaetzle/
 ├── .github/workflows/     # CI/CD
 ├── docs/                   # Architecture & development docs
 ├── scripts/
 │   ├── install.sh         # Bash install script
 │   ├── install.ps1        # PowerShell install script
-│   ├── install-helvetia.sh
-│   ├── install-helvetia.ps1
 │   └── run.sh            # Legacy wrapper
 ├── Dockerfile
 └── README.md

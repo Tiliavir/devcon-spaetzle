@@ -41,7 +41,7 @@ jobs:
             type=semver,pattern={{major}}
             type=raw,value=latest
           labels: |
-            org.opencontainers.image.title=opencode-spaetzle
+            org.opencontainers.image.title=devcon-spaetzle
             org.opencontainers.image.description=Docker dev environment for the OpenCode AI coding agent
             org.opencontainers.image.url=https://github.com/${{ github.repository }}
             org.opencontainers.image.source=https://github.com/${{ github.repository }}

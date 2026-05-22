@@ -1,23 +1,23 @@
 #!/usr/bin/env bash
-# install.sh — Install spaetzle wrapper script for opencode-spaetzle
+# install.sh — Install spaetzle wrapper script for devcon-spaetzle
 #
 # Usage:
-#   curl -fsSL https://raw.githubusercontent.com/tiliavir/opencode-spaetzle/main/scripts/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/tiliavir/devcon-spaetzle/main/scripts/install.sh | bash
 #
 # Or to install to a custom location:
-#   curl -fsSL https://raw.githubusercontent.com/tiliavir/opencode-spaetzle/main/scripts/install.sh | bash -s -- --install-dir /custom/path
+#   curl -fsSL https://raw.githubusercontent.com/tiliavir/devcon-spaetzle/main/scripts/install.sh | bash -s -- --install-dir /custom/path
 
 set -euo pipefail
 
 SCRIPT_NAME="spaetzle"
 INSTALL_DIR="${HOME}/.local/bin"
-DEFAULT_IMAGE="ghcr.io/tiliavir/opencode-spaetzle:latest"
+DEFAULT_IMAGE="ghcr.io/tiliavir/devcon-spaetzle:latest"
 
 usage() {
     cat <<EOF
 Usage: $0 [OPTIONS]
 
-Install spaetzle wrapper script for opencode-spaetzle Docker container.
+Install spaetzle wrapper script for devcon-spaetzle Docker container.
 
 OPTIONS:
     --install-dir DIR    Directory to install spaetzle script (default: ~/.local/bin)
@@ -26,13 +26,13 @@ OPTIONS:
 
 EXAMPLES:
     # Default install
-    curl -fsSL https://raw.githubusercontent.com/tiliavir/opencode-spaetzle/main/scripts/install.sh | bash
+    curl -fsSL https://raw.githubusercontent.com/tiliavir/devcon-spaetzle/main/scripts/install.sh | bash
 
     # Custom install directory
-    curl -fsSL https://raw.githubusercontent.com/tiliavir/opencode-spaetzle/main/scripts/install.sh | bash -s -- --install-dir /usr/local/bin
+    curl -fsSL https://raw.githubusercontent.com/tiliavir/devcon-spaetzle/main/scripts/install.sh | bash -s -- --install-dir /usr/local/bin
 
     # Custom Docker image
-    curl -fsSL https://raw.githubusercontent.com/tiliavir/opencode-spaetzle/main/scripts/install.sh | bash -s -- --image my-registry/opencode-spaetzle:dev
+    curl -fsSL https://raw.githubusercontent.com/tiliavir/devcon-spaetzle/main/scripts/install.sh | bash -s -- --image my-registry/devcon-spaetzle:dev
 EOF
 }
 
@@ -140,39 +140,55 @@ info "Writing spaetzle wrapper to ${INSTALL_DIR}/${SCRIPT_NAME}..."
 
 wrapper_template="$(cat << 'WRAPPER_EOF'
 #!/usr/bin/env bash
-# spaetzle — Docker wrapper for opencode-spaetzle
+# spaetzle — Docker wrapper for devcon-spaetzle
 #
 # Uses host paths detected during installation (Git config, SSH keys,
 # npmrc, Maven settings) and forwards API tokens when present.
 #
 # Usage:
-#   spaetzle [docker run extra flags…] [-- command]
+#   spaetzle [flags] [docker run extra flags…] [-- command]
+#
+# Flags:
+#   --recreate    Remove existing container for this workspace and start fresh
+#   --update      Pull latest image and re-install the wrapper
+#   --version     Show version info
 #
 # Examples:
 #   spaetzle
 #   spaetzle -e OPENAI_API_KEY=sk-...
 #   spaetzle -- opencode
-#   spaetzle --version
+#   spaetzle --recreate
+#   spaetzle --update
 
 set -euo pipefail
 
-IMAGE="${OPENCODE_IMAGE:-ghcr.io/tiliavir/opencode-spaetzle:latest}"
+IMAGE="${OPENCODE_IMAGE:-ghcr.io/tiliavir/devcon-spaetzle:latest}"
 WORKSPACE="${WORKSPACE:-$(pwd)}"
+
+RECREATE=false
+UPDATE=false
 
 warn()  { echo "[spaetzle] WARNING: $*" >&2; }
 info()  { echo "[spaetzle] $*"; }
-
-if [[ "${1:-}" == "--version" ]] || [[ "${1:-}" == "-v" ]]; then
-    echo "spaetzle wrapper for opencode-spaetzle"
-    echo "Image: ${IMAGE}"
-    echo "Workspace: ${WORKSPACE}"
-    exit 0
-fi
 
 EXTRA_ARGS=()
 CMD_OVERRIDE=()
 while [[ $# -gt 0 ]]; do
     case "$1" in
+        --version|-v)
+            echo "spaetzle wrapper for devcon-spaetzle"
+            echo "Image: ${IMAGE}"
+            echo "Workspace: ${WORKSPACE}"
+            exit 0
+            ;;
+        --recreate)
+            RECREATE=true
+            shift
+            ;;
+        --update)
+            UPDATE=true
+            shift
+            ;;
         --)
             shift
             CMD_OVERRIDE=("$@")
@@ -184,6 +200,14 @@ while [[ $# -gt 0 ]]; do
             ;;
     esac
 done
+
+if [ "${UPDATE}" = "true" ]; then
+    info "Pulling latest image..."
+    docker pull "${IMAGE}"
+    info "Re-installing spaetzle wrapper..."
+    curl -fsSL https://raw.githubusercontent.com/tiliavir/devcon-spaetzle/main/scripts/install.sh | bash
+    exit 0
+fi
 
 ENV_FLAGS=()
 
@@ -212,9 +236,21 @@ __STATIC_MOUNT_INFO__
 
 LABEL="spaetzle-$(basename "${WORKSPACE}")"
 
-info "Starting opencode-spaetzle container (image: ${IMAGE})"
+info "Starting devcon-spaetzle container (image: ${IMAGE})"
 info "Workspace: ${WORKSPACE}"
 info "Container label: ${LABEL}"
+
+info "Checking for newer image..."
+if docker pull "${IMAGE}" 2>&1 | grep -q "Downloaded newer"; then
+    info "A newer image was pulled. Run 'spaetzle --update' to regenerate the wrapper."
+fi
+
+if [ "${RECREATE}" = "true" ]; then
+    if docker container inspect "${LABEL}" &>/dev/null; then
+        info "Removing existing container '${LABEL}'..."
+        docker rm -f "${LABEL}"
+    fi
+fi
 
 if docker container inspect "${LABEL}" &>/dev/null; then
     STATUS="$(docker container inspect --format '{{.State.Status}}' "${LABEL}")"

@@ -1,11 +1,11 @@
 # Development guide
 
-This document covers how to develop and maintain the `opencode-spaetzle` project.
+This document covers how to develop and maintain the `devcon-spaetzle` project.
 
 ## Repository structure
 
 ```
-opencode-spaetzle/
+devcon-spaetzle/
 ├── .github/
 │   ├── dependabot.yml          # Automated dependency updates
 │   └── workflows/
@@ -43,6 +43,9 @@ Or use the convenience wrapper (auto-detects git config, SSH keys, and tokens):
 
 ```bash
 ./scripts/run.sh
+
+# Recreate the container for a fresh start
+./scripts/run.sh --recreate
 ```
 
 ### Lint the Dockerfile
@@ -80,10 +83,10 @@ Triggered when a tag matching `v*.*.*` is pushed.
 
 1. Builds the image for `linux/amd64` **and** `linux/arm64` (Apple Silicon compatible)
 2. Pushes to [GitHub Container Registry (GHCR)](https://ghcr.io) with multiple tags:
-   - `ghcr.io/tiliavir/opencode-spaetzle:latest`
-   - `ghcr.io/tiliavir/opencode-spaetzle:1.2.3`
-   - `ghcr.io/tiliavir/opencode-spaetzle:1.2`
-   - `ghcr.io/tiliavir/opencode-spaetzle:1`
+   - `ghcr.io/tiliavir/devcon-spaetzle:latest`
+   - `ghcr.io/tiliavir/devcon-spaetzle:1.2.3`
+   - `ghcr.io/tiliavir/devcon-spaetzle:1.2`
+   - `ghcr.io/tiliavir/devcon-spaetzle:1`
 3. Creates a GitHub Release with auto-generated release notes
 
 ## Creating a release

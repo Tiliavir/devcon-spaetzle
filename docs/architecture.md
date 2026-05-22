@@ -1,6 +1,6 @@
 # Architecture
 
-This document describes the design decisions behind the `opencode-spaetzle` Docker image.
+This document describes the design decisions behind the `devcon-spaetzle` Docker image.
 
 ## Base image
 
@@ -23,15 +23,14 @@ debian:bookworm-slim
  └── apt packages (single RUN layer)
       └── fd symlink
            └── shell aliases
-                └── OpenCode CLI (curl install)
-                     └── GSD install + config
-                          └── Claude Code CLI (curl install)
-                               └── WORKDIR /workspace
                 └── Node.js 22 (NodeSource)
                      └── OpenCode CLI (curl install)
                           └── GSD install + config
-                               └── GSD2 install (gsd-pi)
-                                    └── WORKDIR /workspace
+                               └── Graphify install (pip)
+                                    └── Caveman install (curl install)
+                                         └── GSD2 install (gsd-pi)
+                                              └── Claude Code CLI (curl install)
+                                                   └── WORKDIR /workspace
 ```
 
 All `apt-get` commands are combined in a single `RUN` layer and the apt cache is
