@@ -1,23 +1,23 @@
 #!/usr/bin/env bash
-# install.sh — Install spaetzle wrapper script for opencode-spaetzle
+# install.sh — Install spaetzle wrapper script for devcon-spaetzle
 #
 # Usage:
-#   curl -fsSL https://raw.githubusercontent.com/tiliavir/opencode-spaetzle/main/scripts/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/tiliavir/devcon-spaetzle/main/scripts/install.sh | bash
 #
 # Or to install to a custom location:
-#   curl -fsSL https://raw.githubusercontent.com/tiliavir/opencode-spaetzle/main/scripts/install.sh | bash -s -- --install-dir /custom/path
+#   curl -fsSL https://raw.githubusercontent.com/tiliavir/devcon-spaetzle/main/scripts/install.sh | bash -s -- --install-dir /custom/path
 
 set -euo pipefail
 
 SCRIPT_NAME="spaetzle"
 INSTALL_DIR="${HOME}/.local/bin"
-DEFAULT_IMAGE="ghcr.io/tiliavir/opencode-spaetzle:latest"
+DEFAULT_IMAGE="ghcr.io/tiliavir/devcon-spaetzle:latest"
 
 usage() {
     cat <<EOF
 Usage: $0 [OPTIONS]
 
-Install spaetzle wrapper script for opencode-spaetzle Docker container.
+Install spaetzle wrapper script for devcon-spaetzle Docker container.
 
 OPTIONS:
     --install-dir DIR    Directory to install spaetzle script (default: ~/.local/bin)
@@ -26,13 +26,13 @@ OPTIONS:
 
 EXAMPLES:
     # Default install
-    curl -fsSL https://raw.githubusercontent.com/tiliavir/opencode-spaetzle/main/scripts/install.sh | bash
+    curl -fsSL https://raw.githubusercontent.com/tiliavir/devcon-spaetzle/main/scripts/install.sh | bash
 
     # Custom install directory
-    curl -fsSL https://raw.githubusercontent.com/tiliavir/opencode-spaetzle/main/scripts/install.sh | bash -s -- --install-dir /usr/local/bin
+    curl -fsSL https://raw.githubusercontent.com/tiliavir/devcon-spaetzle/main/scripts/install.sh | bash -s -- --install-dir /usr/local/bin
 
     # Custom Docker image
-    curl -fsSL https://raw.githubusercontent.com/tiliavir/opencode-spaetzle/main/scripts/install.sh | bash -s -- --image my-registry/opencode-spaetzle:dev
+    curl -fsSL https://raw.githubusercontent.com/tiliavir/devcon-spaetzle/main/scripts/install.sh | bash -s -- --image my-registry/devcon-spaetzle:dev
 EOF
 }
 
@@ -140,7 +140,7 @@ info "Writing spaetzle wrapper to ${INSTALL_DIR}/${SCRIPT_NAME}..."
 
 wrapper_template="$(cat << 'WRAPPER_EOF'
 #!/usr/bin/env bash
-# spaetzle — Docker wrapper for opencode-spaetzle
+# spaetzle — Docker wrapper for devcon-spaetzle
 #
 # Uses host paths detected during installation (Git config, SSH keys,
 # npmrc, Maven settings) and forwards API tokens when present.
@@ -156,14 +156,14 @@ wrapper_template="$(cat << 'WRAPPER_EOF'
 
 set -euo pipefail
 
-IMAGE="${OPENCODE_IMAGE:-ghcr.io/tiliavir/opencode-spaetzle:latest}"
+IMAGE="${OPENCODE_IMAGE:-ghcr.io/tiliavir/devcon-spaetzle:latest}"
 WORKSPACE="${WORKSPACE:-$(pwd)}"
 
 warn()  { echo "[spaetzle] WARNING: $*" >&2; }
 info()  { echo "[spaetzle] $*"; }
 
 if [[ "${1:-}" == "--version" ]] || [[ "${1:-}" == "-v" ]]; then
-    echo "spaetzle wrapper for opencode-spaetzle"
+    echo "spaetzle wrapper for devcon-spaetzle"
     echo "Image: ${IMAGE}"
     echo "Workspace: ${WORKSPACE}"
     exit 0
@@ -212,7 +212,7 @@ __STATIC_MOUNT_INFO__
 
 LABEL="spaetzle-$(basename "${WORKSPACE}")"
 
-info "Starting opencode-spaetzle container (image: ${IMAGE})"
+info "Starting devcon-spaetzle container (image: ${IMAGE})"
 info "Workspace: ${WORKSPACE}"
 info "Container label: ${LABEL}"
 

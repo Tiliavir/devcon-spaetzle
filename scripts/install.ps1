@@ -1,14 +1,14 @@
-# install.ps1 — Install spaetzle wrapper script for opencode-spaetzle
+# install.ps1 — Install spaetzle wrapper script for devcon-spaetzle
 #
 # Usage:
-#   irm https://raw.githubusercontent.com/tiliavir/opencode-spaetzle/main/scripts/install.ps1 | iex
+#   irm https://raw.githubusercontent.com/tiliavir/devcon-spaetzle/main/scripts/install.ps1 | iex
 #
 # Or to install to a custom location:
-#   irm https://raw.githubusercontent.com/tiliavir/opencode-spaetzle/main/scripts/install.ps1 | iex -InstallDir "C:\bin"
+#   irm https://raw.githubusercontent.com/tiliavir/devcon-spaetzle/main/scripts/install.ps1 | iex -InstallDir "C:\bin"
 
 param(
     [string]$InstallDir = "$env:USERPROFILE\.local\bin",
-    [string]$Image = "ghcr.io/tiliavir/opencode-spaetzle:latest"
+    [string]$Image = "ghcr.io/tiliavir/devcon-spaetzle:latest"
 )
 
 $ErrorActionPreference = "Stop"
@@ -100,7 +100,7 @@ $spaetzleScript = Join-Path $InstallDir "spaetzle.ps1"
 Write-Info "Writing spaetzle wrapper to $spaetzleScript..."
 
 $scriptContent = @'
-# spaetzle — Docker wrapper for opencode-spaetzle
+# spaetzle — Docker wrapper for devcon-spaetzle
 #
 # Uses host paths detected during installation (Git config, SSH keys,
 # npmrc, Maven settings) and forwards API tokens when present.
@@ -121,7 +121,7 @@ param(
 )
 
 if (-not $Image) {
-    $Image = "ghcr.io/tiliavir/opencode-spaetzle:latest"
+    $Image = "ghcr.io/tiliavir/devcon-spaetzle:latest"
 }
 
 $ErrorActionPreference = "Stop"
@@ -137,7 +137,7 @@ function Write-Warn {
 }
 
 if ($args -contains "-v" -or $args -contains "--version") {
-    Write-Info "spaetzle wrapper for opencode-spaetzle"
+    Write-Info "spaetzle wrapper for devcon-spaetzle"
     Write-Info "Image: $Image"
     Write-Info "Workspace: $Workspace"
     exit 0
@@ -190,7 +190,7 @@ if ($Command) {
     $dockerArgs += $Command
 }
 
-Write-Info "Starting opencode-spaetzle container (image: $Image)"
+Write-Info "Starting devcon-spaetzle container (image: $Image)"
 Write-Info "Workspace: $Workspace"
 Write-Info "Container label: $label"
 

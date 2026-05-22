@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# scripts/run.sh — convenience wrapper for opencode-spaetzle
+# scripts/run.sh — convenience wrapper for devcon-spaetzle
 #
 # Automatically detects and mounts host paths (Git config, SSH keys,
 # Copilot/OpenCode auth stores) and forwards GITHUB_TOKEN when present.
@@ -14,7 +14,7 @@
 
 set -euo pipefail
 
-IMAGE="${OPENCODE_IMAGE:-ghcr.io/tiliavir/opencode-spaetzle:latest}"
+IMAGE="${OPENCODE_IMAGE:-ghcr.io/tiliavir/devcon-spaetzle:latest}"
 WORKSPACE="${WORKSPACE:-$(pwd)}"
 CONTAINER_USER_HOME="${CONTAINER_USER_HOME:-/root}"
 
@@ -105,7 +105,7 @@ maybe_mount "${HOME}/.claude" "${CONTAINER_USER_HOME}/.claude"
 
 LABEL="spaetzle-$(basename "${WORKSPACE}")"
 
-info "Starting opencode-spaetzle container (image: ${IMAGE})"
+info "Starting devcon-spaetzle container (image: ${IMAGE})"
 info "Workspace: ${WORKSPACE}"
 info "Container label: ${LABEL}"
 

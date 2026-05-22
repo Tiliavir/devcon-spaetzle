@@ -1,6 +1,6 @@
 # Architecture
 
-This document describes the design decisions behind the `opencode-spaetzle` Docker image.
+This document describes the design decisions behind the `devcon-spaetzle` Docker image.
 
 ## Base image
 
