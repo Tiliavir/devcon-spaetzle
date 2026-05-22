@@ -52,6 +52,7 @@ RUN curl -fsSL https://opencode.ai/install | bash
 ENV PATH="/root/.local/bin:${PATH}"
 
 # Install Claude Code CLI
+# hadolint ignore=DL3016
 RUN npm install -g @anthropic-ai/claude-code
 
 # Install GSD (get-shit-done-cc) and pre-configure for OpenCode + Claude
@@ -59,7 +60,8 @@ RUN npx --yes get-shit-done-cc@latest --opencode --global \
     && npx --yes get-shit-done-cc@latest --claude --global
 
 # Install Graphify — AI knowledge graph (PyPI: graphifyy)
-RUN pip install --break-system-packages "graphifyy[all]"
+# hadolint ignore=DL3013,DL3042
+RUN pip install --break-system-packages --no-cache-dir "graphifyy[all]"
 
 # Install Caveman — output token compression for AI agents
 RUN curl -fsSL https://raw.githubusercontent.com/JuliusBrussee/caveman/main/install.sh | bash
